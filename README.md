@@ -1,6 +1,6 @@
 ## Electrolink Client for WeIO
 Example of using [electrolink-client-mqtt-python](https://github.com/projectiota/electrolink-client-mqtt-python) library
-to drive WeIO board remotely
+to drive WeIO board remotely.
 
 ## Usage
 
