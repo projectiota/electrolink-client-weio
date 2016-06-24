@@ -15,6 +15,8 @@ WeIO board
 ```bash
 python test.py
 ```
+> N.B. Once started, test can be stopped from another terminal by executing:
+> `ps aux | grep python | grep test | awk '{print $2}' | xargs kill`
 
-## LICENSE
+## License
 [Apache-2.0](LICENSE)
