@@ -22,6 +22,7 @@ class Electrolink():
         # Define event callbacks
         def on_connect(mosq, obj, rc):
             print("rc: " + str(rc))
+            self.client.subscribe(self.mqttTopicRsp)
 
         def on_message(mosq, obj, msg):
             print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
@@ -44,10 +45,10 @@ class Electrolink():
         self.client.on_connect = on_connect
         self.client.on_message = on_message
         self.client.on_publish = on_publish
+        self.client.on_subscribe = on_subscribe
 
+        print self.host, self.port
         self.client.connect(self.host, self.port, 60)
-
-        self.client.subscribe(self.mqttTopicRsp)
 
         # Start looping
         self.client.loop_start()
