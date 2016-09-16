@@ -16,8 +16,8 @@ class Electrolink():
         self.token = ''
         self.client = None
         self.msg = {}
-        self.msgId = 0
-        self.qs = {}
+        self.qs = Queue.Queue()
+        self.callbacks = {}
 
         # Define event callbacks
         def on_connect(mosq, obj, rc):
@@ -28,7 +28,13 @@ class Electrolink():
             print(msg.topic + " " + str(msg.qos) + " " + str(msg.payload))
 
             p = json.loads(msg.payload);
-            self.qs[p['id']].put(p)
+
+            # If it is interrupt then just call attached callback
+            if (p['id'] == "INTERRUPT"):
+                self.callbacks[p['data']]()
+            else:
+                # It is not an interrupt but return to our request
+                self.qs.put(p)
 
         def on_publish(mosq, obj, mid):
             print("mid: " + str(mid))
@@ -54,23 +60,11 @@ class Electrolink():
         self.client.loop_start()
 
     def linkIt(self):
-        self.msg['jsonrpc'] = '2.0'
-
-        # Increment self.msgId to make it unique
-        self.msgId += 1
-        self.msg['id'] = self.msgId
-
-        # Create a queue for this message
-        self.qs[self.msgId] = Queue.Queue()
-
         payload = json.dumps(self.msg)
         (rc, mid) = self.client.publish(self.mqttTopicReq, payload, qos=1)
 
         # Block on queue waiting for response
-        rsp = self.qs[self.msgId].get()
-
-        # Delete queue for this message
-        del self.qs[self.msgId]
+        rsp = self.qs.get()
 
         return rsp
 
@@ -83,10 +77,8 @@ class Electrolink():
     def pinFunction(self, pinId, pinFnc):
         """
         {
-            'jsonrpc': '2.0',
             'method': 'setFunction',
             'params': [<pinId>, <pinFnc>],
-            'id': <msgId>
         }
         """
         self.msg['method'] = 'pinFunction'
@@ -130,10 +122,11 @@ class Electrolink():
     ###
     # attachInterrupt()
     ###
-    def attachInterrupt(self, intId, pinId, mode):
+    def attachInterrupt(self, pinId, mode, callback):
 
+        self.callbacks[callback.__name__] = callback
         self.msg['method'] = 'attachInterrupt'
-        self.msg['params'] = [intId, pinId, mode]
+        self.msg['params'] = [pinId, mode, callback.__name__]
         
         return self.linkIt()
 
@@ -141,10 +134,10 @@ class Electrolink():
     ###
     # detachInterrupt()
     ###
-    def detachInterrupt(self, intId):
+    def detachInterrupt(self, pinId):
 
         self.msg['method'] = 'detachInterrupt'
-        self.msg['params'] = [intId]
+        self.msg['params'] = [pinId]
         
         return self.linkIt()
 
