@@ -185,12 +185,25 @@ class Electrolink():
         return self.linkIt()
 
     ###
-    # pwmSet()
+    # pwmSetPulseWidth()
     ###
-    def pwmSet(self, pwmNb, channel, hiTime):
+    def pwmSetPulseWidth(self, channel, hiTime):
 
-        self.msg['method'] = 'pwmSet'
-        self.msg['params'] = [pwmNb, channel, hiTime]
+        self.msg['method'] = 'pwmSetPulseWidth'
+        self.msg['params'] = [channel, hiTime]
+        
+        return self.linkIt()
+
+    ###
+    # pwmWrite()
+    ###
+    """
+    Set the output duty-cycle percentage
+    """
+    def pwmWrite(self, pwmNb, percentage):
+
+        self.msg['method'] = 'pwmWrite'
+        self.msg['params'] = [pwmNb, percentage]
         
         return self.linkIt()
 
