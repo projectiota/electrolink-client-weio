@@ -276,6 +276,47 @@ class Electrolink():
         
         return self.linkIt()
 
+    # === UART ===
+
+    ###
+    # uartStart()
+    ###
+    def uartStart(self, baudrate):
+
+        self.msg['method'] = 'uartStart'
+        self.msg['params'] = [baudrate]
+
+        return self.linkIt()
+
+    ###
+    # uartSend()
+    ###
+    def uartSend(self, wrData):
+
+        self.msg['method'] = 'uartSend'
+        self.msg['params'] = [wrData]
+
+        return self.linkIt()
+
+    ###
+    # uartReceive()
+    ###
+    def uartReceive(self):
+
+        self.msg['method'] = 'uartReceive'
+        self.msg['params'] = []
+
+        return self.linkIt()
+
+    ###
+    # uartStop()
+    ###
+    def uartStop(self):
+
+        self.msg['method'] = 'uartStop'
+        self.msg['params'] = []
+
+        return self.linkIt()
 
     # === System ===
 
